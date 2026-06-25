@@ -8,24 +8,34 @@ const supabase = createClient(
 
 export const revalidate = 30;
 
+async function getDiscordStats() {
+  try {
+    const token = process.env.DISCORD_BOT_TOKEN;
+    const guildId = process.env.DISCORD_SERVER_ID;
+    const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}?with_counts=true`, {
+      headers: { Authorization: `Bot ${token}` },
+      cache: "no-store",
+    });
+    const data = await res.json();
+    return { members: data.approximate_member_count || 0, online: data.approximate_presence_count || 0 };
+  } catch {
+    return { members: 0, online: 0 };
+  }
+}
+
 export default async function Home() {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-  
-  const [{ data: resources }, discordRes] = await Promise.all([
+  const [{ data: resources }, discord] = await Promise.all([
     supabase.from("resources").select("*").order("created_at", { ascending: false }),
-    fetch(`${siteUrl}/api/discord-stats`, { cache: "no-store" }),
+    getDiscordStats(),
   ]);
 
-  const discord = await discordRes.json();
   const list = resources || [];
 
   return (
     <main className="min-h-screen bg-[#0d0d0d] text-white">
       <nav className="border-b border-[#222] px-6 py-3 flex items-center justify-between">
         <span className="text-yellow-400 font-black text-xl tracking-widest">VANTAGE</span>
-        <button className="bg-yellow-400 text-black px-4 py-2 rounded font-bold text-sm">
-          Login
-        </button>
+        <button className="bg-yellow-400 text-black px-4 py-2 rounded font-bold text-sm">Login</button>
       </nav>
 
       <div className="px-6 py-6">
@@ -37,8 +47,8 @@ export default async function Home() {
 
       <div className="px-6 mb-6 grid grid-cols-5 gap-3">
         {[
-          { label: "TOTAL USERS", value: discord.members?.toLocaleString() || "0" },
-          { label: "ONLINE NOW", value: discord.online?.toLocaleString() || "0" },
+          { label: "TOTAL USERS", value: discord.members.toLocaleString() },
+          { label: "ONLINE NOW", value: discord.online.toLocaleString() },
           { label: "DOWNLOADS", value: list.reduce((sum: number, r: any) => sum + (r.downloads || 0), 0).toLocaleString() },
           { label: "RESOURCES", value: list.length.toString() },
         ].map((s) => (
