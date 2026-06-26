@@ -1,4 +1,6 @@
 "use client";
+export const dynamic = "force-dynamic";
+
 import { createClient } from "@supabase/supabase-js";
 import ResourceCard from "./ResourceCard";
 import { useState, useEffect } from "react";
@@ -155,3 +157,4 @@ export default function Home() {
     </main>
   );
 }
+
