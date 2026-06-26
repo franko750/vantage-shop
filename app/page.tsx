@@ -1,11 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import ResourceCard from "./ResourceCard";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
 export const revalidate = 30;
 
 async function getDiscordStats() {
@@ -24,6 +19,11 @@ async function getDiscordStats() {
 }
 
 export default async function Home() {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
   const [{ data: resources }, discord] = await Promise.all([
     supabase.from("resources").select("*").order("created_at", { ascending: false }),
     getDiscordStats(),
