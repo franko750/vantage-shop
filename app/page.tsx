@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 import { createClient } from "@supabase/supabase-js";
 import ResourceCard from "./ResourceCard";
 import { useState, useEffect } from "react";
-import { useSession, signIn, signOut } from "next-auth/react";
+
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -12,7 +12,7 @@ const supabase = createClient(
 );
 
 export default function Home() {
-  const { data: session } = useSession();
+  
   const [resources, setResources] = useState<any[]>([]);
   const [discord, setDiscord] = useState({ members: 0, online: 0 });
   const [search, setSearch] = useState("");
@@ -48,7 +48,7 @@ export default function Home() {
           <span className="text-yellow-400 font-black text-2xl tracking-widest">VANTAGE</span>
           <span className="text-[10px] bg-yellow-400 text-black font-black px-2 py-0.5 rounded ml-1">SHOP</span>
         </div>
-        {session ? (
+        {false ? (
           <div className="flex items-center gap-3">
             <img src={session.user?.image || ""} className="w-8 h-8 rounded-full border border-yellow-400" />
             <span className="text-sm text-gray-300">{session.user?.name}</span>
@@ -157,4 +157,6 @@ export default function Home() {
     </main>
   );
 }
+
+
 
